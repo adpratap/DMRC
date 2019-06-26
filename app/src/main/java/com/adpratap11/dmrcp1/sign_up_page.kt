@@ -85,15 +85,16 @@ class sign_up_page : AppCompatActivity() {
         val user =User (uid.toString(),usrname_R.text.toString())
         ref.setValue(user)
             .addOnSuccessListener {
+
+                val toast = Toast.makeText(applicationContext, "SUCCESS NOW LOG-IN", Toast.LENGTH_SHORT)
+                toast.show()
                 progressBar.visibility = View.GONE
                 val intent = Intent(this,MainActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
                 startActivity(intent)
 
 
 
-                val toast = Toast.makeText(applicationContext, "SUCCESS NOW LOG-IN", Toast.LENGTH_SHORT)
-                toast.show()
+
             }
     }
 

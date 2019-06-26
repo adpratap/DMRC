@@ -13,13 +13,14 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import kotlinx.android.synthetic.main.activity_attendence.*
 import android.net.ConnectivityManager
+import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
 
 
 val REQUEST_IMAGE_CAPTURE = 1
 
-val MY_PERMISSIONS_REQUEST_READ_CONTACTS = 0
+val MY_PERMISSIONS_REQUEST_CM = 0
 
 
 class attendence : AppCompatActivity() {
@@ -63,7 +64,7 @@ class attendence : AppCompatActivity() {
                         ActivityCompat.requestPermissions(
                             this,
                             arrayOf(Manifest.permission.CAMERA),
-                            MY_PERMISSIONS_REQUEST_READ_CONTACTS
+                            MY_PERMISSIONS_REQUEST_CM
                         )
 
 
@@ -91,7 +92,9 @@ class attendence : AppCompatActivity() {
         button_upload.setOnClickListener {
             if (net()){
 
-                
+                progressBar.visibility = View.VISIBLE
+
+
 
             }else{
 
