@@ -16,6 +16,7 @@ import android.net.ConnectivityManager
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
+import com.google.firebase.auth.FirebaseAuth
 
 
 val REQUEST_IMAGE_CAPTURE = 1
@@ -32,7 +33,34 @@ class attendence : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_attendence)
 
-        val progressBar: ProgressBar = this.progressBar3
+        var progressBar: ProgressBar = this.progressBar3
+
+
+
+        var user = FirebaseAuth.getInstance().currentUser
+
+        var name = user?.displayName.toString()
+
+        if (user != null) {
+
+
+            // User is signed in
+
+            USRNAME.text= name
+            val toast = Toast.makeText(applicationContext, name, Toast.LENGTH_SHORT)
+            toast.show()
+
+        } else {
+
+            // No user is signed in
+
+            val toast = Toast.makeText(applicationContext, "NO USER PLZ TRY AGAIN", Toast.LENGTH_SHORT)
+            toast.show()
+
+            val intent = Intent(this,MainActivity::class.java)
+            startActivity(intent)
+        }
+
 
 
 
