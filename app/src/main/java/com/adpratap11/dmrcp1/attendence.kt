@@ -2,10 +2,15 @@ package com.adpratap11.dmrcp1
 
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
@@ -13,136 +18,177 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import kotlinx.android.synthetic.main.activity_attendence.*
 import android.net.ConnectivityManager
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
+import android.util.Log
 import android.view.View
-import android.widget.ProgressBar
 import android.widget.Toast
+import com.google.android.gms.tasks.Continuation
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.UploadTask
+import java.io.ByteArrayOutputStream
+import java.util.*
 
 
 val REQUEST_IMAGE_CAPTURE = 1
-
 val MY_PERMISSIONS_REQUEST_CM = 0
+val storageRef = FirebaseStorage.getInstance().reference
+val user = FirebaseAuth.getInstance().currentUser
+lateinit var picurl: String
+
+private const val PERMISSION_REQUEST = 10
+lateinit var latitude : String
+lateinit var longitude : String
+lateinit var latitudenet : String
+lateinit var longitudenet : String
+
 
 
 class attendence : AppCompatActivity() {
 
 
 
+    lateinit var locationManager: LocationManager
+    private var hasGps = false
+    private var hasNetwork = false
+    private var locationGps: Location? = null
+    private var locationNetwork: Location? = null
+    private var permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_attendence)
 
-        var progressBar: ProgressBar = this.progressBar3
-
-
-
-        var user = FirebaseAuth.getInstance().currentUser
-
-        var name = user?.displayName.toString()
-
-        if (user != null) {
-
-
-            // User is signed in
-
-            USRNAME.text= name
-            val toast = Toast.makeText(applicationContext, name, Toast.LENGTH_SHORT)
-            toast.show()
-
-        } else {
-
-            // No user is signed in
-
-            val toast = Toast.makeText(applicationContext, "NO USER PLZ TRY AGAIN", Toast.LENGTH_SHORT)
-            toast.show()
-
-            val intent = Intent(this,MainActivity::class.java)
-            startActivity(intent)
-        }
 
 
 
 
 
-        profilepic.setOnClickListener {
 
 
+        button_upload.setOnClickListener{
             if (net()) {
 
 
+                if (user != null) {
 
 
-                if (ContextCompat.checkSelfPermission(
-                        this,
-                        Manifest.permission.CAMERA
-                    )
-                    != PackageManager.PERMISSION_GRANTED
-                ) {
+                    // User is signed
 
-                    if (ActivityCompat.shouldShowRequestPermissionRationale(
-                            this,
-                            Manifest.permission.CAMERA
-                        )
-                    ) {
+                    progressBar3.visibility = View.VISIBLE
+                    val picuser = storageRef.child(user.toString().trim())
+                    val bitmap = (profilepic.drawable as BitmapDrawable).bitmap
+                    val baos = ByteArrayOutputStream()
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+                    val data = baos.toByteArray()
+                    val uploadTask = picuser.putBytes(data)
 
-                    } else {
+                    uploadTask.continueWithTask(Continuation<UploadTask.TaskSnapshot, Task<Uri>> { task ->
+                        if (!task.isSuccessful) {
+                            task.exception?.let {
+                                throw it
+                            }
+                        }
+                        return@Continuation picuser.downloadUrl
+                    }).addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            picurl = task.result.toString()
+                            dataupload()
 
 
-                        ActivityCompat.requestPermissions(
-                            this,
-                            arrayOf(Manifest.permission.CAMERA),
-                            MY_PERMISSIONS_REQUEST_CM
-                        )
-
-
+                        } else {
+                            // Handle failures
+                            // ...
+                        }
                     }
-                } else {
-                    // Permission has already been granted
 
-                    dispatchTakePictureIntent()
+
+
+
+
+
+
+
+                } else {
+
+                    // No user is signed in
+
+                    val toast = Toast.makeText(applicationContext, "NO USER PLZ TRY AGAIN", Toast.LENGTH_SHORT)
+                    toast.show()
+
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
                 }
 
 
-            }
-            else{
+            } else {
 
                 val toast = Toast.makeText(applicationContext, "no internet", Toast.LENGTH_SHORT)
                 toast.show()
 
             }
+
         }
 
+        profilepic.setOnClickListener{
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
 
 
-        //upload
+                    } else {
 
-        button_upload.setOnClickListener {
-            if (net()){
+                        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA,Manifest.permission.ACCESS_FINE_LOCATION), MY_PERMISSIONS_REQUEST_CM)
 
-                progressBar.visibility = View.VISIBLE
+                    }
+                } else {
+
+                    // Permission has already been granted
+
+
+                    dispatchTakePictureIntent()
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (checkPermission(permissions)) {
+                        enableView()
+                    } else {
+                        requestPermissions(permissions, PERMISSION_REQUEST)
+                    }
+                } else {
+                    enableView()
+                }
+
+                }
 
 
 
-            }else{
-
-                val toast = Toast.makeText(applicationContext, "no internet", Toast.LENGTH_SHORT)
-                toast.show()
-
-            }
         }
-
-
-
-
-
-
-
 
 
     }
 
-    private fun dispatchTakePictureIntent() {
+    private fun getdata() {
+
+        val ref = FirebaseDatabase.getInstance().getReference("DMRC USERS LIST")
+        ref.addValueEventListener(object : ValueEventListener{
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+            override fun onDataChange(p0: DataSnapshot) {
+
+            }
+
+        })
+
+    }
+
+    fun dispatchTakePictureIntent() {
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
             takePictureIntent.resolveActivity(packageManager)?.also {
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
@@ -150,14 +196,14 @@ class attendence : AppCompatActivity() {
         }
     }
 
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             val imageBitmap = data?.extras?.get("data") as Bitmap
             profilepic.setImageBitmap(imageBitmap)
+
+
         }
     }
-
 
     fun net(): Boolean {
         val manager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -170,9 +216,172 @@ class attendence : AppCompatActivity() {
         return isAvailable
     }
 
+    fun dataupload(){
+
+
+        val imurl = picurl
+        val userlocation = "GPS latitude : $latitude  longitude : $longitude"
+        val nowTD = getCurrentDateTime().toString()
+        val reff = FirebaseDatabase.getInstance().getReference("DMRC USERS DATA")
+        val remarksuser = remarks.text.toString()
 
 
 
+        //uploading data
+            val userdata = Record(imurl, userlocation, nowTD, remarksuser)
+            reff.child(nowTD).setValue(userdata)
+                .addOnCompleteListener {
+
+
+                    progressBar3.visibility = View.GONE
+
+                    Toast.makeText(applicationContext, "SUCCESS upload data", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(this, MainActivity::class.java)
+                    //startActivity(intent)
+
+
+                }.addOnFailureListener {
+                    progressBar3.visibility = View.GONE
+                    Toast.makeText(applicationContext, "error upload data", Toast.LENGTH_SHORT).show()
+                    return@addOnFailureListener
+                }.addOnCanceledListener {
+                    progressBar3.visibility = View.GONE
+                    Toast.makeText(applicationContext, "error upload data canceled", Toast.LENGTH_SHORT).show()
+                    return@addOnCanceledListener
+                }
+    }
+
+    fun getCurrentDateTime(): Date {
+        return Calendar.getInstance().time
+    }
+
+
+
+    private fun enableView() {
+
+        getLocation()
+
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun getLocation() {
+        progressBar3.visibility = View.VISIBLE
+
+        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        hasGps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        hasNetwork = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+        if (hasGps || hasNetwork) {
+
+            if (hasGps) {
+                Log.d("CodeAndroidLocation", "hasGps")
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0F, object :
+                    LocationListener {
+                    override fun onLocationChanged(location: Location?) {
+                        if (location != null) {
+                            locationGps = location
+                           // latitude=locationGps!!.latitude.toString()
+                           // longitude=locationGps!!.longitude.toString()
+                        }
+                    }
+
+                    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
+
+                    }
+
+                    override fun onProviderEnabled(provider: String?) {
+
+                    }
+
+                    override fun onProviderDisabled(provider: String?) {
+
+                    }
+
+                })
+
+                val localGpsLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                if (localGpsLocation != null)
+                    locationGps = localGpsLocation
+            }
+            if (hasNetwork) {
+                Log.d("CodeAndroidLocation", "hasGps")
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 0F, object : LocationListener {
+                    override fun onLocationChanged(location: Location?) {
+                        if (location != null) {
+                            locationNetwork = location
+                            //latitudenet=locationNetwork!!.latitude.toString()
+                            //longitudenet=locationNetwork!!.longitude.toString()
+                        }
+                    }
+
+                    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
+
+                    }
+
+                    override fun onProviderEnabled(provider: String?) {
+
+                    }
+
+                    override fun onProviderDisabled(provider: String?) {
+
+                    }
+
+                })
+
+                val localNetworkLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+                if (localNetworkLocation != null)
+                    locationNetwork = localNetworkLocation
+            }
+
+            if(locationGps!= null && locationNetwork!= null){
+                progressBar3.visibility = View.GONE
+                if(locationGps!!.accuracy > locationNetwork!!.accuracy){
+                    latitudenet=locationNetwork!!.latitude.toString()
+                    longitudenet=locationNetwork!!.longitude.toString()
+                    gpslg.text="GPS longitude : $longitude"
+                    gpslt.text="GPS latitude : $latitude"
+                }else{
+                    latitude=locationGps!!.latitude.toString()
+                    longitude=locationGps!!.longitude.toString()
+                    gpslg.text="GPS longitude : $longitude"
+                    gpslt.text="GPS latitude : $latitude"
+                }
+            }
+
+        } else {
+            progressBar3.visibility = View.GONE
+            startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+        }
+    }
+
+    private fun checkPermission(permissionArray: Array<String>): Boolean {
+        var allSuccess = true
+        for (i in permissionArray.indices) {
+            if (checkCallingOrSelfPermission(permissionArray[i]) == PackageManager.PERMISSION_DENIED)
+                allSuccess = false
+        }
+        return allSuccess
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == PERMISSION_REQUEST) {
+            var allSuccess = true
+            for (i in permissions.indices) {
+                if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
+                    allSuccess = false
+                    val requestAgain = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && shouldShowRequestPermissionRationale(permissions[i])
+                    if (requestAgain) {
+                        Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this, "Go to settings and enable the permission", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+            if (allSuccess)
+                enableView()
+
+        }
+    }
 
 
 }

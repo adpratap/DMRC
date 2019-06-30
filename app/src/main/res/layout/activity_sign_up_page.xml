@@ -28,6 +28,7 @@
             android:gravity="center"
             android:layout_height="50dp"
             android:inputType="textPersonName"
+            android:padding="10dp"
             android:foregroundGravity="center"
             android:ems="10"
             android:id="@+id/usrname_R"
@@ -40,6 +41,7 @@
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:inputType="textEmailAddress"
+            android:padding="10dp"
             android:gravity="center"
             android:ems="10"
             android:id="@+id/email_R" android:layout_marginTop="16dp"
@@ -49,6 +51,7 @@
     <EditText
             android:layout_width="0dp"
             android:gravity="center"
+            android:padding="10dp"
             android:layout_height="50dp"
             android:inputType="textPassword"
             android:ems="10"

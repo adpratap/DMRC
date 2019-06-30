@@ -9,6 +9,7 @@
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:inputType="textPassword"
+            android:padding="10dp"
             android:ems="10"
             android:id="@+id/password" android:layout_marginTop="16dp"
             app:layout_constraintTop_toBottomOf="@+id/email"
@@ -19,6 +20,7 @@
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:inputType="textEmailAddress"
+            android:padding="10dp"
             android:ems="10"
             android:id="@+id/email"
             android:layout_marginStart="50dp"
@@ -53,13 +55,14 @@
             android:layout_marginTop="30dp" app:layout_constraintTop_toBottomOf="@+id/imageView3"/>
     <Button
             android:text="Sign up"
-            android:layout_width="81dp"
-            android:layout_height="51dp"
+            android:layout_width="121dp"
+            android:layout_height="50dp"
             android:id="@+id/signup"
             android:background="@drawable/btn_rounded"
             app:layout_constraintEnd_toEndOf="@+id/password"
             app:layout_constraintStart_toStartOf="@+id/password" app:layout_constraintHorizontal_bias="1.0"
-            android:layout_marginTop="40dp" app:layout_constraintTop_toBottomOf="@+id/signin"/>
+            android:layout_marginTop="40dp" app:layout_constraintTop_toBottomOf="@+id/signin"
+    />
     <ImageView
             android:layout_width="220dp"
             android:layout_height="131dp"
