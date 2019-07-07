@@ -18,9 +18,11 @@ import java.util.*
 
 class sign_up_page : AppCompatActivity() {
 
+
     lateinit var user : EditText
     lateinit var email : EditText
     lateinit var password : EditText
+
 
 
 
@@ -28,11 +30,11 @@ class sign_up_page : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_up_page)
 
+
         user = findViewById(R.id.usrname_R)
         password = findViewById(R.id.password_R)
         email = findViewById(R.id.email_R)
 
-        val progressBar: ProgressBar = this.progressBar
 
 
         button_signup.setOnClickListener {
@@ -40,15 +42,16 @@ class sign_up_page : AppCompatActivity() {
             if (net()) {
 
 
-                progressBar.visibility = View.VISIBLE
+                progressBarsignup.visibility = View.VISIBLE
 
                 val name = user.text.toString()
                 val pass = password.text.toString()
                 val email = email.text.toString()
 
-                if (email.isEmpty() || pass.isEmpty() || name.isEmpty()) {
 
-                    progressBar.visibility = View.GONE
+                if (email.isEmpty() && pass.isEmpty() && name.isEmpty()) {
+
+                    progressBarsignup.visibility = View.GONE
 
 
                     val toast = Toast.makeText(applicationContext, "ERROR EMPTY FILLEDS", Toast.LENGTH_SHORT)
@@ -60,14 +63,13 @@ class sign_up_page : AppCompatActivity() {
 
                 FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, pass).addOnCompleteListener {
 
-                    val toast = Toast.makeText(applicationContext, "user created", Toast.LENGTH_SHORT)
-                    toast.show()
-
+                    //Toast.makeText(applicationContext, "user created", Toast.LENGTH_SHORT).show()
                     datauploadd()
 
 
+
                 }.addOnCanceledListener {
-                    progressBar.visibility = View.GONE
+                    progressBarsignup.visibility = View.GONE
                     val toast = Toast.makeText(applicationContext, "ERROR", Toast.LENGTH_SHORT)
                     toast.show()
                     return@addOnCanceledListener
@@ -104,43 +106,47 @@ class sign_up_page : AppCompatActivity() {
 
     private fun datauploadd(){
 
+
+
+        val ref = FirebaseDatabase.getInstance().getReference("DMRC USERS LIST")
         val name = user.text.toString().trim()
         val emaiil = email.text.toString().trim()
         val timedate = getCurrentDateTime().toString()
-        val ref = FirebaseDatabase.getInstance().getReference("DMRC USERS LIST")
-        val id =  ref.push().key.toString()
-        val user = FirebaseAuth.getInstance().currentUser
-
-        if(name.isEmpty()||emaiil.isEmpty()) {
+        val userids = FirebaseAuth.getInstance().currentUser!!.uid
 
 
-            Toast.makeText(applicationContext, "plz enter data", Toast.LENGTH_SHORT).show()
 
-
-        }else{
 
             //uploading data
-            val dmrcuser = DMRCUSER(id,name,timedate,emaiil)
-            ref.child(id).setValue(dmrcuser)
+            val dmrcuser = DMRCUSER(userids,name,timedate,emaiil)
+            ref.child(userids).setValue(dmrcuser)
                 .addOnCompleteListener {
 
-                    Toast.makeText(applicationContext, "SUCCESS upload data", Toast.LENGTH_SHORT).show()
-                    progressBar.visibility = View.GONE
-                    val intent = Intent(this, MainActivity::class.java)
+                    Toast.makeText(applicationContext, "sign up done", Toast.LENGTH_SHORT).show()
+
+                    progressBarsignup.visibility = View.GONE
+
+                    val intent = Intent(this,MainActivity::class.java)
                     startActivity(intent)
+                    return@addOnCompleteListener
 
 
                 }.addOnFailureListener {
-                    progressBar.visibility = View.GONE
+
+
+
                     Toast.makeText(applicationContext, "error upload data", Toast.LENGTH_SHORT).show()
                     return@addOnFailureListener
+
                 }.addOnCanceledListener {
-                    progressBar.visibility = View.GONE
+
+
                     Toast.makeText(applicationContext, "error upload data canceled", Toast.LENGTH_SHORT).show()
                     return@addOnCanceledListener
+
                 }
 
-        }
+
 
     }
 

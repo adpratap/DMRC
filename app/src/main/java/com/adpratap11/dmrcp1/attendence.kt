@@ -3,6 +3,7 @@ package com.adpratap11.dmrcp1
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -33,18 +34,24 @@ import com.google.firebase.storage.UploadTask
 import java.io.ByteArrayOutputStream
 import java.util.*
 
-
 val REQUEST_IMAGE_CAPTURE = 1
 val MY_PERMISSIONS_REQUEST_CM = 0
-val storageRef = FirebaseStorage.getInstance().reference
-val user = FirebaseAuth.getInstance().currentUser
 lateinit var picurl: String
-
 private const val PERMISSION_REQUEST = 10
 lateinit var latitude : String
 lateinit var longitude : String
 lateinit var latitudenet : String
 lateinit var longitudenet : String
+lateinit var locationManager: LocationManager
+val storageRef = FirebaseStorage.getInstance().reference
+val user = FirebaseAuth.getInstance().currentUser
+private var hasGps = false
+private var hasNetwork = false
+private var locationGps: Location? = null
+private var locationNetwork: Location? = null
+private var permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+
+
 
 
 
@@ -52,22 +59,22 @@ class attendence : AppCompatActivity() {
 
 
 
-    lateinit var locationManager: LocationManager
-    private var hasGps = false
-    private var hasNetwork = false
-    private var locationGps: Location? = null
-    private var locationNetwork: Location? = null
-    private var permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_attendence)
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkPermission(permissions)) {
+                getLocation()
+            } else {
+                requestPermissions(permissions, PERMISSION_REQUEST)
+            }
+        } else {
+            getLocation()
+        }
 
 
-
-
-
+        getdata()
 
 
         button_upload.setOnClickListener{
@@ -143,7 +150,11 @@ class attendence : AppCompatActivity() {
 
                     } else {
 
-                        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA,Manifest.permission.ACCESS_FINE_LOCATION), MY_PERMISSIONS_REQUEST_CM)
+                        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), MY_PERMISSIONS_REQUEST_CM)
+
+
+
+
 
                     }
                 } else {
@@ -151,17 +162,25 @@ class attendence : AppCompatActivity() {
                     // Permission has already been granted
 
 
+
+
                     dispatchTakePictureIntent()
 
+
+                // get location on pic click
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     if (checkPermission(permissions)) {
-                        enableView()
+                        getLocation()
                     } else {
                         requestPermissions(permissions, PERMISSION_REQUEST)
                     }
                 } else {
-                    enableView()
+                    getLocation()
                 }
+
+
+
+
 
                 }
 
@@ -169,22 +188,42 @@ class attendence : AppCompatActivity() {
 
         }
 
+       // FirebaseDatabase.getInstance().setPersistenceEnabled(false)
 
     }
 
     private fun getdata() {
 
-        val ref = FirebaseDatabase.getInstance().getReference("DMRC USERS LIST")
-        ref.addValueEventListener(object : ValueEventListener{
+        val ref = FirebaseDatabase.getInstance().getReference("DMRC USERS LIST/"+user!!.uid)
+        ref.keepSynced(true)
+
+
+        ref.addValueEventListener(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
+
+                Toast.makeText(applicationContext, "snapshot error", Toast.LENGTH_SHORT).show()
+
 
             }
 
             override fun onDataChange(p0: DataSnapshot) {
 
+
+
+
+
+
+                   USRNAME.text = p0.child("username").getValue().toString()
+
+
+
+
+
+
             }
 
         })
+
 
     }
 
@@ -200,6 +239,8 @@ class attendence : AppCompatActivity() {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             val imageBitmap = data?.extras?.get("data") as Bitmap
             profilepic.setImageBitmap(imageBitmap)
+            button_upload.visibility=View.VISIBLE
+            taponimage.visibility=View.GONE
 
 
         }
@@ -222,22 +263,37 @@ class attendence : AppCompatActivity() {
         val imurl = picurl
         val userlocation = "GPS latitude : $latitude  longitude : $longitude"
         val nowTD = getCurrentDateTime().toString()
-        val reff = FirebaseDatabase.getInstance().getReference("DMRC USERS DATA")
+        val reff = FirebaseDatabase.getInstance().getReference("DMRC USERS DAILY DATA")
+        reff.keepSynced(true)
         val remarksuser = remarks.text.toString()
+        val userid = FirebaseAuth.getInstance().currentUser!!.uid
+        val aname = USRNAME.text.toString()
+
+
 
 
 
         //uploading data
-            val userdata = Record(imurl, userlocation, nowTD, remarksuser)
-            reff.child(nowTD).setValue(userdata)
+            val userdata = Record(imurl, userlocation, nowTD, remarksuser,aname)
+            reff.child(userid).child(nowTD).setValue(userdata)
                 .addOnCompleteListener {
 
 
                     progressBar3.visibility = View.GONE
 
                     Toast.makeText(applicationContext, "SUCCESS upload data", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this, MainActivity::class.java)
+                    USRNAME.visibility=View.GONE
+                    button_upload.visibility=View.GONE
+                    profilepic.visibility=View.GONE
+                    remarks.visibility=View.GONE
+                    thankyou.visibility=View.VISIBLE
+
+
+
+
+                    //val intent = Intent(this, MainActivity::class.java)
                     //startActivity(intent)
+
 
 
                 }.addOnFailureListener {
@@ -249,18 +305,16 @@ class attendence : AppCompatActivity() {
                     Toast.makeText(applicationContext, "error upload data canceled", Toast.LENGTH_SHORT).show()
                     return@addOnCanceledListener
                 }
+
+
     }
 
     fun getCurrentDateTime(): Date {
         return Calendar.getInstance().time
     }
 
-
-
-    private fun enableView() {
-
-        getLocation()
-
+    fun getCurrentTime(): Date {
+        return Date()
     }
 
     @SuppressLint("MissingPermission")
@@ -279,8 +333,6 @@ class attendence : AppCompatActivity() {
                     override fun onLocationChanged(location: Location?) {
                         if (location != null) {
                             locationGps = location
-                           // latitude=locationGps!!.latitude.toString()
-                           // longitude=locationGps!!.longitude.toString()
                         }
                     }
 
@@ -308,8 +360,6 @@ class attendence : AppCompatActivity() {
                     override fun onLocationChanged(location: Location?) {
                         if (location != null) {
                             locationNetwork = location
-                            //latitudenet=locationNetwork!!.latitude.toString()
-                            //longitudenet=locationNetwork!!.longitude.toString()
                         }
                     }
 
@@ -348,8 +398,11 @@ class attendence : AppCompatActivity() {
             }
 
         } else {
+
             progressBar3.visibility = View.GONE
+            Toast.makeText(applicationContext, "plz on gps", Toast.LENGTH_SHORT).show()
             startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+            getLocation()
         }
     }
 
@@ -378,10 +431,13 @@ class attendence : AppCompatActivity() {
                 }
             }
             if (allSuccess)
-                enableView()
+               getLocation()
 
         }
     }
+
+
+
 
 
 }

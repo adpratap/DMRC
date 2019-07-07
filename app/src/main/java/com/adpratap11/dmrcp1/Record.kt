@@ -1,3 +1,6 @@
 package com.adpratap11.dmrcp1
 
-class Record (val image_url : String,val location : String,val timedate : String,val remarks : String)
+class Record (val Image_url : String,val Location : String,val Timedate : String,val Remarks : String,val Name :String){
+
+
+}

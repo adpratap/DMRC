@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
-
-          package="com.adpratap11.dmrcp1"
->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools"
+          package="com.adpratap11.dmrcp1">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-feature android:name="android.hardware.camera"
-                  android:required="true" />
-    <uses-permission android:name="android.permission.CAMERA"
-    android:required="true"/>
+
+    <uses-feature
+            android:name="android.hardware.camera"
+            android:required="true"/>
+
+    <uses-permission
+            android:name="android.permission.CAMERA"
+            android:required="true"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
@@ -22,25 +25,28 @@
             android:label="@string/app_name"
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
-            android:theme="@style/Theme.AppCompat.NoActionBar" tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".attendence"
-        android:screenOrientation="portrait">
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            tools:ignore="GoogleAppIndexingWarning"
+            android:name=".DMRCP1">
+        <activity android:name=".admin">
         </activity>
-        <activity android:name=".sign_up_page"
-                  android:screenOrientation="portrait">
+        <activity
+                android:name=".attendence"
+                android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".MainActivity"
-                  android:screenOrientation="portrait">
+        <activity
+                android:name=".sign_up_page"
+                android:screenOrientation="portrait">
+        </activity>
+        <activity
+                android:name=".MainActivity"
+                android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
-
-
-
     </application>
 
 </manifest>
