@@ -6,6 +6,7 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
@@ -25,6 +26,7 @@ import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
@@ -62,6 +64,22 @@ class attendence : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_attendence)
+
+
+        locationManager = getSystemService(LOCATION_SERVICE) as LocationManager;
+
+    if( !locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ) {
+
+        val toast = Toast.makeText(applicationContext, "TURN ON GPS FIRST", Toast.LENGTH_SHORT)
+        toast.show()
+
+        //val intent = Intent(this, MainActivity::class.java)
+        //startActivity(intent)
+        startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+
+    }
+
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkPermission(permissions)) {
@@ -211,9 +229,10 @@ class attendence : AppCompatActivity() {
 
 
 
+                val mmm = p0.child("username").getValue().toString()
 
 
-                   USRNAME.text = p0.child("username").getValue().toString()
+                   USRNAME.text = "Mr/Mrs $mmm"
 
 
 
@@ -239,8 +258,10 @@ class attendence : AppCompatActivity() {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             val imageBitmap = data?.extras?.get("data") as Bitmap
             profilepic.setImageBitmap(imageBitmap)
+            textView5.visibility=View.GONE
+            remarks.visibility=View.VISIBLE
             button_upload.visibility=View.VISIBLE
-            taponimage.visibility=View.GONE
+
 
 
         }
@@ -436,6 +457,30 @@ class attendence : AppCompatActivity() {
         }
     }
 
+
+    private fun turnGPSOn() {
+        val provider = Settings.Secure.getString(contentResolver, Settings.Secure.LOCATION_PROVIDERS_ALLOWED)
+
+        if (!provider.contains("gps")) { //if gps is disabled
+            val poke = Intent()
+            poke.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider")
+            poke.addCategory(Intent.CATEGORY_ALTERNATIVE)
+            poke.data = Uri.parse("3")
+            sendBroadcast(poke)
+        }
+    }
+
+    private fun turnGPSOff() {
+        val provider = Settings.Secure.getString(contentResolver, Settings.Secure.LOCATION_PROVIDERS_ALLOWED)
+
+        if (provider.contains("gps")) { //if gps is enabled
+            val poke = Intent()
+            poke.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider")
+            poke.addCategory(Intent.CATEGORY_ALTERNATIVE)
+            poke.data = Uri.parse("3")
+            sendBroadcast(poke)
+        }
+    }
 
 
 
