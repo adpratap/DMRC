@@ -65,22 +65,6 @@ class attendence : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_attendence)
 
-
-        locationManager = getSystemService(LOCATION_SERVICE) as LocationManager;
-
-    if( !locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ) {
-
-        val toast = Toast.makeText(applicationContext, "TURN ON GPS FIRST", Toast.LENGTH_SHORT)
-        toast.show()
-
-        //val intent = Intent(this, MainActivity::class.java)
-        //startActivity(intent)
-        startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
-
-    }
-
-
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkPermission(permissions)) {
                 getLocation()
@@ -102,35 +86,34 @@ class attendence : AppCompatActivity() {
                 if (user != null) {
 
 
-                    // User is signed
+                            // User is signed
 
-                    progressBar3.visibility = View.VISIBLE
-                    val picuser = storageRef.child(user.toString().trim())
-                    val bitmap = (profilepic.drawable as BitmapDrawable).bitmap
-                    val baos = ByteArrayOutputStream()
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
-                    val data = baos.toByteArray()
-                    val uploadTask = picuser.putBytes(data)
+                            progressBar3.visibility = View.VISIBLE
+                            val picuser = storageRef.child(user.toString().trim())
+                            val bitmap = (profilepic.drawable as BitmapDrawable).bitmap
+                            val baos = ByteArrayOutputStream()
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+                            val data = baos.toByteArray()
+                            val uploadTask = picuser.putBytes(data)
 
-                    uploadTask.continueWithTask(Continuation<UploadTask.TaskSnapshot, Task<Uri>> { task ->
-                        if (!task.isSuccessful) {
-                            task.exception?.let {
-                                throw it
+                            uploadTask.continueWithTask(Continuation<UploadTask.TaskSnapshot, Task<Uri>> { task ->
+                                if (!task.isSuccessful) {
+                                    task.exception?.let {
+                                        throw it
+                                    }
+                                }
+                                return@Continuation picuser.downloadUrl
+                            }).addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    picurl = task.result.toString()
+                                    dataupload()
+
+
+                                } else {
+                                    // Handle failures
+                                    // ...
+                                }
                             }
-                        }
-                        return@Continuation picuser.downloadUrl
-                    }).addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            picurl = task.result.toString()
-                            dataupload()
-
-
-                        } else {
-                            // Handle failures
-                            // ...
-                        }
-                    }
-
 
 
 
@@ -206,7 +189,15 @@ class attendence : AppCompatActivity() {
 
         }
 
-       // FirebaseDatabase.getInstance().setPersistenceEnabled(false)
+        val userlc = "GPS latitude : $latitude  longitude : $longitude"
+
+        if ( userlc==""){
+
+            getLocation()
+
+        }
+
+
 
     }
 
@@ -308,6 +299,7 @@ class attendence : AppCompatActivity() {
                     profilepic.visibility=View.GONE
                     remarks.visibility=View.GONE
                     thankyou.visibility=View.VISIBLE
+                    textView6.visibility=View.GONE
 
 
 
@@ -340,10 +332,27 @@ class attendence : AppCompatActivity() {
 
     @SuppressLint("MissingPermission")
     private fun getLocation() {
-        progressBar3.visibility = View.VISIBLE
+       // progressBar3.visibility = View.VISIBLE
+        Toast.makeText(this, "Finding location plz Wait", Toast.LENGTH_SHORT).show()
+
 
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        hasGps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+
+        if( !locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ) {
+
+            val toast = Toast.makeText(applicationContext, "TURN ON GPS FIRST", Toast.LENGTH_SHORT)
+            toast.show()
+
+
+            val intent = Intent(this, MainActivity::class.java)
+
+            startActivity(intent)
+
+            startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+
+
+        }else
+            hasGps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
         hasNetwork = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
         if (hasGps || hasNetwork) {
 
@@ -372,8 +381,10 @@ class attendence : AppCompatActivity() {
                 })
 
                 val localGpsLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-                if (localGpsLocation != null)
+                if (localGpsLocation != null){
                     locationGps = localGpsLocation
+                }
+
             }
             if (hasNetwork) {
                 Log.d("CodeAndroidLocation", "hasGps")
@@ -404,7 +415,7 @@ class attendence : AppCompatActivity() {
             }
 
             if(locationGps!= null && locationNetwork!= null){
-                progressBar3.visibility = View.GONE
+                //progressBar3.visibility = View.GONE
                 if(locationGps!!.accuracy > locationNetwork!!.accuracy){
                     latitudenet=locationNetwork!!.latitude.toString()
                     longitudenet=locationNetwork!!.longitude.toString()
@@ -420,11 +431,27 @@ class attendence : AppCompatActivity() {
 
         } else {
 
-            progressBar3.visibility = View.GONE
-            Toast.makeText(applicationContext, "plz on gps", Toast.LENGTH_SHORT).show()
-            startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
-            getLocation()
+            //progressBar3.visibility = View.GONE
+            //Toast.makeText(applicationContext, "plz turn on gps", Toast.LENGTH_SHORT).show()
+            locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+
+            if( !locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ) {
+
+                val toast = Toast.makeText(applicationContext, "TURN ON GPS FIRST", Toast.LENGTH_SHORT)
+                toast.show()
+
+                startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+
+                val intent = Intent(this, MainActivity::class.java)
+
+                startActivity(intent)
+
+            }
+
+
+
         }
+
     }
 
     private fun checkPermission(permissionArray: Array<String>): Boolean {
@@ -457,30 +484,6 @@ class attendence : AppCompatActivity() {
         }
     }
 
-
-    private fun turnGPSOn() {
-        val provider = Settings.Secure.getString(contentResolver, Settings.Secure.LOCATION_PROVIDERS_ALLOWED)
-
-        if (!provider.contains("gps")) { //if gps is disabled
-            val poke = Intent()
-            poke.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider")
-            poke.addCategory(Intent.CATEGORY_ALTERNATIVE)
-            poke.data = Uri.parse("3")
-            sendBroadcast(poke)
-        }
-    }
-
-    private fun turnGPSOff() {
-        val provider = Settings.Secure.getString(contentResolver, Settings.Secure.LOCATION_PROVIDERS_ALLOWED)
-
-        if (provider.contains("gps")) { //if gps is enabled
-            val poke = Intent()
-            poke.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider")
-            poke.addCategory(Intent.CATEGORY_ALTERNATIVE)
-            poke.data = Uri.parse("3")
-            sendBroadcast(poke)
-        }
-    }
 
 
 
