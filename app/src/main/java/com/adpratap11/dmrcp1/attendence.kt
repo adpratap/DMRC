@@ -252,6 +252,7 @@ class attendence : AppCompatActivity() {
 
 
 
+
         }
     }
 
@@ -297,6 +298,8 @@ class attendence : AppCompatActivity() {
                     remarks.visibility=View.GONE
                     thankyou.visibility=View.VISIBLE
                     textView6.visibility=View.GONE
+                    gpslt.visibility=View.GONE
+                    gpslg.visibility=View.GONE
 
 
 
