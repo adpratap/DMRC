@@ -48,7 +48,7 @@ private var hasGps = false
 private var hasNetwork = false
 private var locationGps: Location? = null
 private var locationNetwork: Location? = null
-private var permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+private var permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.CAMERA)
 
 
 
@@ -62,6 +62,28 @@ class attendence : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_attendence)
 
+
+        val login = FirebaseAuth.getInstance().currentUser
+        if (login != null) {
+
+            getdata()
+
+            getLocation()
+
+
+        } else {
+
+            // No user is signed in
+
+            val toast = Toast.makeText(applicationContext, "NO USER PLZ TRY AGAIN", Toast.LENGTH_SHORT)
+            toast.show()
+
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
+
+
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkPermission(permissions)) {
                 getLocation()
@@ -73,17 +95,10 @@ class attendence : AppCompatActivity() {
         }
 
 
-        getdata()
-
 
         button_upload.setOnClickListener{
-            if (net()) {
 
 
-                if (user != null) {
-
-
-                            // User is signed
 
                             progressBar3.visibility = View.VISIBLE
                             val picuser = storageRef.child(user.toString().trim())
@@ -103,43 +118,23 @@ class attendence : AppCompatActivity() {
                             }).addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
                                     picurl = task.result.toString()
+
                                     dataupload()
 
 
                                 } else {
                                     // Handle failures
-                                    // ...
+
                                 }
                             }
-
-
-
-
-
-
-
-                } else {
-
-                    // No user is signed in
-
-                    val toast = Toast.makeText(applicationContext, "NO USER PLZ TRY AGAIN", Toast.LENGTH_SHORT)
-                    toast.show()
-
-                    val intent = Intent(this, MainActivity::class.java)
-                    startActivity(intent)
-                }
-
-
-            } else {
-
-                val toast = Toast.makeText(applicationContext, "no internet", Toast.LENGTH_SHORT)
-                toast.show()
-
-            }
 
         }
 
         profilepic.setOnClickListener{
+
+            getLocation()
+
+            getdata()
 
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
 
@@ -163,18 +158,7 @@ class attendence : AppCompatActivity() {
 
 
                     dispatchTakePictureIntent()
-
-
-                // get location on pic click
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if (checkPermission(permissions)) {
-                        getLocation()
-                    } else {
-                        requestPermissions(permissions, PERMISSION_REQUEST)
-                    }
-                } else {
                     getLocation()
-                }
 
 
 
@@ -185,51 +169,46 @@ class attendence : AppCompatActivity() {
 
 
         }
-
-        val userlc = "GPS latitude : $latitude  longitude : $longitude"
-
-        if ( userlc==""){
-
-            getLocation()
-
-        }
-
 
 
     }
 
     private fun getdata() {
 
-        val ref = FirebaseDatabase.getInstance().getReference("DMRC USERS LIST/"+user!!.uid)
-        ref.keepSynced(true)
 
 
-        ref.addValueEventListener(object : ValueEventListener {
-            override fun onCancelled(p0: DatabaseError) {
+        val users = FirebaseAuth.getInstance().currentUser
 
-                Toast.makeText(applicationContext, "snapshot error", Toast.LENGTH_SHORT).show()
+        if (users!=null) {
 
-
-            }
-
-            override fun onDataChange(p0: DataSnapshot) {
+            val ref = FirebaseDatabase.getInstance().getReference("DMRC USERS LIST/" + users.uid)
+            ref.keepSynced(true)
 
 
+            ref.addValueEventListener(object : ValueEventListener {
+                override fun onCancelled(p0: DatabaseError) {
+
+                    Toast.makeText(applicationContext, "snapshot error", Toast.LENGTH_SHORT).show()
 
 
-                val mmm = p0.child("username").getValue().toString()
+                }
+
+                override fun onDataChange(p0: DataSnapshot) {
 
 
-                   USRNAME.text = "Mr/Mrs $mmm"
+                    val mmm = p0.child("username").getValue().toString()
 
 
+                    USRNAME.text = "Mr/Mrs $mmm"
+
+                    getLocation()
 
 
+                }
 
+            })
 
-            }
-
-        })
+        }
 
 
     }
@@ -256,16 +235,6 @@ class attendence : AppCompatActivity() {
         }
     }
 
-    fun net(): Boolean {
-        val manager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val networkInfo = manager.activeNetworkInfo
-
-        var isAvailable = false
-        if (networkInfo != null && networkInfo.isConnected) {
-            isAvailable = true
-        }
-        return isAvailable
-    }
 
     fun dataupload(){
 
@@ -278,10 +247,6 @@ class attendence : AppCompatActivity() {
         val remarksuser = remarks.text.toString()
         val userid = FirebaseAuth.getInstance().currentUser!!.uid
         val aname = USRNAME.text.toString()
-
-
-
-
 
         //uploading data
             val userdata = Record(imurl, userlocation, nowTD, remarksuser,aname)
@@ -300,9 +265,6 @@ class attendence : AppCompatActivity() {
                     textView6.visibility=View.GONE
                     gpslt.visibility=View.GONE
                     gpslg.visibility=View.GONE
-
-
-
 
                     //val intent = Intent(this, MainActivity::class.java)
                     //startActivity(intent)
@@ -326,14 +288,10 @@ class attendence : AppCompatActivity() {
         return Calendar.getInstance().time
     }
 
-    fun getCurrentTime(): Date {
-        return Date()
-    }
-
     @SuppressLint("MissingPermission")
     private fun getLocation() {
        // progressBar3.visibility = View.VISIBLE
-        Toast.makeText(this, "Finding location plz Wait", Toast.LENGTH_SHORT).show()
+       // Toast.makeText(this, "Finding location plz Wait", Toast.LENGTH_SHORT).show()
 
 
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -343,10 +301,6 @@ class attendence : AppCompatActivity() {
             val toast = Toast.makeText(applicationContext, "TURN ON GPS FIRST", Toast.LENGTH_SHORT)
             toast.show()
 
-
-            val intent = Intent(this, MainActivity::class.java)
-
-            startActivity(intent)
 
             startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
 
@@ -442,9 +396,7 @@ class attendence : AppCompatActivity() {
 
                 startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
 
-                val intent = Intent(this, MainActivity::class.java)
-
-                startActivity(intent)
+                getLocation()
 
             }
 
@@ -479,6 +431,7 @@ class attendence : AppCompatActivity() {
                 }
             }
             if (allSuccess)
+
                getLocation()
 
         }

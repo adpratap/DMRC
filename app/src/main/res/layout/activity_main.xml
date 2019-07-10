@@ -11,11 +11,12 @@
             android:inputType="textPassword"
             android:padding="10dp"
             android:ems="10"
-            android:id="@+id/password" android:layout_marginTop="16dp"
+            android:id="@+id/password" android:layout_marginTop="18dp"
             app:layout_constraintTop_toBottomOf="@+id/email"
             app:layout_constraintEnd_toEndOf="@+id/email" app:layout_constraintStart_toStartOf="@+id/email"
             android:hint="PASSWORD" android:background="@drawable/rounded_text"
-            android:gravity="center"/>
+            android:gravity="center" android:layout_marginBottom="18dp"
+            app:layout_constraintBottom_toTopOf="@+id/signin" app:layout_constraintHorizontal_bias="0.0"/>
     <EditText
             android:layout_width="0dp"
             android:layout_height="50dp"
@@ -29,16 +30,18 @@
             app:layout_constraintHorizontal_bias="1.0"
             tools:ignore="MissingConstraints"
             android:layout_marginTop="18dp" app:layout_constraintTop_toBottomOf="@+id/textView_R"
-            android:gravity="center"/>
+            android:gravity="center" android:layout_marginBottom="18dp"
+            app:layout_constraintBottom_toTopOf="@+id/password"/>
     <Button
             android:text="Sign In"
             android:layout_width="0dp"
             android:layout_height="50dp"
-            android:id="@+id/signin" android:layout_marginTop="50dp"
+            android:id="@+id/signin" android:layout_marginTop="18dp"
             android:background="@drawable/btn_rounded"
             app:layout_constraintTop_toBottomOf="@+id/password"
             app:layout_constraintEnd_toEndOf="@+id/password"
-            app:layout_constraintStart_toStartOf="@+id/password"/>
+            app:layout_constraintStart_toStartOf="@+id/password" android:layout_marginBottom="18dp"
+            app:layout_constraintBottom_toTopOf="@+id/signup"/>
     <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -52,7 +55,8 @@
             android:id="@+id/textView_R" android:layout_marginRight="60dp"
             android:layout_marginLeft="60dp" android:background="#2B2B2B"
             tools:ignore="MissingConstraints"
-            android:layout_marginTop="8dp" app:layout_constraintTop_toBottomOf="@+id/imageView3"/>
+            android:layout_marginTop="18dp" app:layout_constraintTop_toBottomOf="@+id/imageView3"
+            android:layout_marginBottom="18dp" app:layout_constraintBottom_toTopOf="@+id/email"/>
     <Button
             android:text="Sign up"
             android:layout_width="121dp"
@@ -61,15 +65,16 @@
             android:background="@drawable/btn_rounded"
             app:layout_constraintEnd_toEndOf="@+id/password"
             app:layout_constraintStart_toStartOf="@+id/password" app:layout_constraintHorizontal_bias="1.0"
-            android:layout_marginTop="30dp" app:layout_constraintTop_toBottomOf="@+id/signin"
-    />
+            android:layout_marginTop="18dp" app:layout_constraintTop_toBottomOf="@+id/signin"
+            android:layout_marginBottom="8dp" app:layout_constraintBottom_toTopOf="@+id/textView4"/>
     <ImageView
             android:layout_width="220dp"
             android:layout_height="131dp"
             app:srcCompat="@drawable/svg"
             android:id="@+id/imageView3" app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
             app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="8dp"
-            android:layout_marginTop="10dp" app:layout_constraintTop_toTopOf="parent"/>
+            android:layout_marginTop="8dp" app:layout_constraintTop_toTopOf="parent" android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/textView_R"/>
     <ProgressBar
             style="?android:attr/progressBarStyle"
             android:layout_width="119dp"
@@ -80,4 +85,11 @@
             app:layout_constraintTop_toTopOf="parent" android:layout_marginBottom="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             android:visibility="gone" app:layout_constraintVertical_bias="0.411"/>
+    <TextView
+            android:text="Delhi Metro Rail Corporation Limited"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView4" app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="8dp"
+            app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
+            app:layout_constraintBottom_toBottomOf="parent" android:layout_marginBottom="10dp"/>
 </android.support.constraint.ConstraintLayout>
