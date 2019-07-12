@@ -11,25 +11,27 @@ import android.graphics.drawable.BitmapDrawable
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
-import android.support.v7.app.AppCompatActivity
-import android.os.Bundle
-import android.provider.MediaStore
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
-import kotlinx.android.synthetic.main.activity_attendence.*
-import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
+import android.os.Bundle
+import android.provider.MediaStore
 import android.provider.Settings
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.*
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
+import kotlinx.android.synthetic.main.activity_attendence.*
 import java.io.ByteArrayOutputStream
 import java.util.*
 
@@ -170,6 +172,12 @@ class attendence : AppCompatActivity() {
 
         }
 
+        history.setOnClickListener {
+
+            val intent = Intent(this, admin::class.java)
+            startActivity(intent)
+        }
+
 
     }
 
@@ -196,7 +204,7 @@ class attendence : AppCompatActivity() {
                 override fun onDataChange(p0: DataSnapshot) {
 
 
-                    val mmm = p0.child("username").getValue().toString()
+                    val mmm = p0.child("username").value.toString()
 
 
                     USRNAME.text = "Mr/Mrs $mmm"
@@ -265,9 +273,8 @@ class attendence : AppCompatActivity() {
                     textView6.visibility=View.GONE
                     gpslt.visibility=View.GONE
                     gpslg.visibility=View.GONE
+                    history.visibility = View.VISIBLE
 
-                    //val intent = Intent(this, MainActivity::class.java)
-                    //startActivity(intent)
 
 
 
