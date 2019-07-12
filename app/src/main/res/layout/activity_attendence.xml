@@ -34,12 +34,12 @@
             android:layout_height="40dp"
             android:id="@+id/remarks"
             app:layout_constraintTop_toBottomOf="@+id/profilepic" android:layout_marginTop="8dp"
-            android:hint="REMARKS"
+            android:hint="@string/remarks"
             android:layout_marginStart="8dp" app:layout_constraintStart_toStartOf="parent"
             android:layout_marginEnd="8dp" app:layout_constraintEnd_toEndOf="parent" android:layout_marginBottom="18dp"
             app:layout_constraintBottom_toTopOf="@+id/button_upload"/>
     <Button
-            android:text="UPLOAD"
+            android:text="@string/upload"
             android:layout_width="201dp"
             android:layout_height="40dp"
             android:visibility="invisible"
@@ -50,7 +50,7 @@
             app:layout_constraintStart_toStartOf="@+id/remarks"
             android:layout_marginBottom="8dp" app:layout_constraintBottom_toTopOf="@+id/gpslt"/>
     <TextView
-            android:text="ATTENDENCE"
+            android:text="@string/attendence"
             android:textSize="15sp"
             android:gravity="center"
             android:textColor="#DD4804"
@@ -121,11 +121,11 @@
             app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
             app:layout_constraintTop_toTopOf="parent" android:layout_marginBottom="8dp"
             app:layout_constraintBottom_toBottomOf="@+id/gpslg" app:layout_constraintVertical_bias="0.797"
-            android:text="Your attendance has been recorded."
+            android:text="@string/your_attendance_has_been_recorded"
             android:textSize="12sp"
             android:visibility="gone" app:layout_constraintHorizontal_bias="0.531"/>
     <TextView
-            android:text="TAP ON IMAGE AND A TAKE PIC"
+            android:text="@string/tap_on_image_and_a_take_pic"
             android:gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -140,7 +140,7 @@
             android:layout_marginBottom="8dp" app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintVertical_bias="0.804"/>
     <TextView
-            android:text="Welcome"
+            android:text="@string/welcome"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="12sp"
@@ -151,7 +151,7 @@
             android:layout_marginBottom="8dp" app:layout_constraintBottom_toTopOf="@+id/USRNAME"
             app:layout_constraintHorizontal_bias="0.498"/>
     <Button
-            android:text="HISTORY"
+            android:text="@string/history"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/btn_rounded"

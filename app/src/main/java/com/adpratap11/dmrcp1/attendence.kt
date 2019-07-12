@@ -136,7 +136,6 @@ class attendence : AppCompatActivity() {
 
             getLocation()
 
-            getdata()
 
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
 
@@ -176,6 +175,13 @@ class attendence : AppCompatActivity() {
 
             val intent = Intent(this, admin::class.java)
             startActivity(intent)
+        }
+
+        imageView2.setOnClickListener {
+
+            val intent = Intent(this, admin::class.java)
+            startActivity(intent)
+
         }
 
 

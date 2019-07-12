@@ -21,10 +21,10 @@ class DataAdepter(val mCtx: Context, val layoutresid: Int, val List: List<model>
         val textviewimage = view.findViewById<ImageView>(R.id.imageadmin)
 
         val list = List[position]
-        textviewname.text = list.Name
-        textviewlocation.text = list.Location
-        textviewremarks.text = list.Remarks
-        textviewtime.text = list.Timedate
+        textviewname.text = "Name : " + list.Name
+        textviewlocation.text = "Location : " + list.Location
+        textviewremarks.text = "Remarks : " + list.Remarks
+        textviewtime.text = "Date : " + list.Timedate
         val uril = list.Image_url
         Glide.with(mCtx).load(uril).into(textviewimage)
 

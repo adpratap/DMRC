@@ -1,3 +1,22 @@
 <resources>
     <string name="app_name">DMRC</string>
+    <string name="history">HISTORY</string>
+    <string name="remarks">REMARKS</string>
+    <string name="upload">UPLOAD</string>
+    <string name="attendence">ATTENDENCE</string>
+    <string name="your_attendance_has_been_recorded">Your attendance has been recorded.</string>
+    <string name="tap_on_image_and_a_take_pic">TAP ON IMAGE AND A TAKE PIC</string>
+    <string name="welcome">Welcome</string>
+    <string name="history">HISTORY</string>
+    <string name="password">PASSWORD</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="e_mail">E-MAIL</string>
+    <string name="name">NAME</string>
+    <string name="sign_up_page">SIGN-UP</string>
+    <string name="password">PASSWORD</string>
+    <string name="email">EMAIL</string>
+    <string name="sign_in">Sign In</string>
+    <string name="log_in">LOG-IN</string>
+    <string name="sign_up_login">Sign up</string>
+    <string name="delhi_metro_rail_corporation_limited">Delhi Metro Rail Corporation Limited</string>
 </resources>

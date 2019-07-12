@@ -8,41 +8,46 @@
 
     <ImageView
             android:layout_width="111dp"
+            android:foregroundGravity="center"
             android:layout_height="152dp" app:srcCompat="@drawable/imagep"
             android:id="@+id/imageadmin"
-            app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="8dp"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:layout_marginBottom="8dp" app:layout_constraintBottom_toBottomOf="parent"
-            tools:ignore="VectorDrawableCompat"/>
+            tools:ignore="VectorDrawableCompat" app:layout_constraintVertical_bias="1.0"
+            android:layout_marginStart="8dp"/>
     <TextView
-            android:text="TextView"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:gravity="center"
             android:textColor="#FFFFFF"
             android:layout_height="wrap_content"
             android:id="@+id/nameadmin" app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
             app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toEndOf="@+id/imageadmin"
             android:layout_marginStart="8dp"
-            app:layout_constraintHorizontal_bias="0.502" android:layout_marginTop="10dp"/>
+            app:layout_constraintHorizontal_bias="0.0" android:layout_marginTop="16dp"/>
     <TextView
-            android:text="TextView"
+
+            android:gravity="center"
             android:textColor="#FFFFFF"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:id="@+id/locationadmin"
             app:layout_constraintTop_toBottomOf="@+id/nameadmin" app:layout_constraintStart_toStartOf="@+id/nameadmin"
             app:layout_constraintEnd_toEndOf="@+id/nameadmin" android:layout_marginTop="15dp"
             app:layout_constraintHorizontal_bias="0.0"/>
     <TextView
-            android:text="TextView"
-            android:layout_width="wrap_content"
+            android:gravity="center"
+            android:layout_width="0dp"
             android:textColor="#FFFFFF"
             android:layout_height="wrap_content"
             android:id="@+id/timeadmin" android:layout_marginTop="15dp"
-            app:layout_constraintTop_toBottomOf="@+id/locationadmin" app:layout_constraintStart_toStartOf="@+id/locationadmin"
+            app:layout_constraintTop_toBottomOf="@+id/locationadmin"
+            app:layout_constraintStart_toStartOf="@+id/locationadmin"
             app:layout_constraintEnd_toEndOf="@+id/locationadmin" app:layout_constraintHorizontal_bias="0.0"/>
     <TextView
-            android:text="TextView"
-            android:layout_width="wrap_content"
+
+            android:gravity="center"
+            android:layout_width="0dp"
             android:textColor="#FFFFFF"
             android:layout_height="wrap_content"
             android:id="@+id/remarksadmin" android:layout_marginTop="8dp"
