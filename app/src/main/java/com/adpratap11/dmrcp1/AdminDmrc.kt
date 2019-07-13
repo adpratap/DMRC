@@ -1,6 +1,6 @@
 package com.adpratap11.dmrcp1
 
-import android.app.DatePickerDialog
+
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
@@ -14,9 +14,9 @@ import kotlinx.android.synthetic.main.activity_admin_dmrc.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-lateinit var d: String
-lateinit var m: String
-lateinit var y: String
+//lateinit var d: String
+//lateinit var m: String
+//lateinit var y: String
 
 
 class AdminDmrc : AppCompatActivity() {
@@ -29,26 +29,27 @@ class AdminDmrc : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_admin_dmrc)
 
-        val cal = Calendar.getInstance()
-        val dd = cal.get(Calendar.DAY_OF_MONTH)
-        val mm = cal.get(Calendar.MONTH)
-        val yy = cal.get(Calendar.YEAR)
+        //val cal = Calendar.getInstance()
+        //val dd = cal.get(Calendar.DAY_OF_MONTH)
+        //val mm = cal.get(Calendar.MONTH)
+        //val yy = cal.get(Calendar.YEAR)
 
         admindatalist = mutableListOf()
         adminlistView = findViewById(R.id.dmrclistview)
 
 
-        dateinputlayout.setOnClickListener {
+        /* dateinputlayout.setOnClickListener {
 
-            val datenew = DatePickerDialog(this, DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
-                d = dayOfMonth.toString()
-                m = month.toString()
-                y = year.toString()
-            }, yy, mm, dd)
+             val datenew = DatePickerDialog(this, DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
+                 d = dayOfMonth.toString()
+                 m = month.toString()
+                 y = year.toString()
+             }, yy, mm, dd)
 
-            // datenew.show()
+             // datenew.show()
 
-        }
+         }
+         */
 
 
 

@@ -113,7 +113,7 @@ class attendence : AppCompatActivity() {
 
 
             progressBar3.visibility = View.VISIBLE
-            val picuser = storageRef.child(user.toString().trim())
+            val picuser = storageRef.child(user!!.uid).child(userdate)
             val bitmap = (profilepic.drawable as BitmapDrawable).bitmap
             val baos = ByteArrayOutputStream()
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
@@ -275,7 +275,7 @@ class attendence : AppCompatActivity() {
 
         //uploading data
             val userdata = Record(imurl, userlocation, nowTD, remarksuser,aname)
-            reff.child(userid).child(nowTD).setValue(userdata)
+        reff.child(userid).child(nowD).setValue(userdata)
                 .addOnCompleteListener {
 
 
