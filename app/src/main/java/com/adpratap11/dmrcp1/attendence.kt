@@ -33,6 +33,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import kotlinx.android.synthetic.main.activity_attendence.*
 import java.io.ByteArrayOutputStream
+import java.text.SimpleDateFormat
 import java.util.*
 
 val REQUEST_IMAGE_CAPTURE = 1
@@ -58,11 +59,17 @@ private var permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Mani
 
 class attendence : AppCompatActivity() {
 
+    lateinit var usertime: String
+    lateinit var userdate: String
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_attendence)
+
+        val toast = Toast.makeText(applicationContext, date(), Toast.LENGTH_SHORT)
+        toast.show()
 
 
         val login = FirebaseAuth.getInstance().currentUser
@@ -101,34 +108,37 @@ class attendence : AppCompatActivity() {
         button_upload.setOnClickListener{
 
 
-
-                            progressBar3.visibility = View.VISIBLE
-                            val picuser = storageRef.child(user.toString().trim())
-                            val bitmap = (profilepic.drawable as BitmapDrawable).bitmap
-                            val baos = ByteArrayOutputStream()
-                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
-                            val data = baos.toByteArray()
-                            val uploadTask = picuser.putBytes(data)
-
-                            uploadTask.continueWithTask(Continuation<UploadTask.TaskSnapshot, Task<Uri>> { task ->
-                                if (!task.isSuccessful) {
-                                    task.exception?.let {
-                                        throw it
-                                    }
-                                }
-                                return@Continuation picuser.downloadUrl
-                            }).addOnCompleteListener { task ->
-                                if (task.isSuccessful) {
-                                    picurl = task.result.toString()
-
-                                    dataupload()
+            usertime = getCurrentDateTime().toString()
+            userdate = date()
 
 
-                                } else {
-                                    // Handle failures
+            progressBar3.visibility = View.VISIBLE
+            val picuser = storageRef.child(user.toString().trim())
+            val bitmap = (profilepic.drawable as BitmapDrawable).bitmap
+            val baos = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+            val data = baos.toByteArray()
+            val uploadTask = picuser.putBytes(data)
 
-                                }
-                            }
+            uploadTask.continueWithTask(Continuation<UploadTask.TaskSnapshot, Task<Uri>> { task ->
+                if (!task.isSuccessful) {
+                    task.exception?.let {
+                        throw it
+                    }
+                }
+                return@Continuation picuser.downloadUrl
+            }).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    picurl = task.result.toString()
+
+                    dataupload()
+
+
+                } else {
+                    // Handle failures
+
+                }
+            }
 
         }
 
@@ -249,14 +259,15 @@ class attendence : AppCompatActivity() {
         }
     }
 
-
     fun dataupload(){
 
 
         val imurl = picurl
         val userlocation = "GPS latitude : $latitude  longitude : $longitude"
-        val nowTD = getCurrentDateTime().toString()
+        val nowTD = usertime
+        val nowD = userdate
         val reff = FirebaseDatabase.getInstance().getReference("DMRC USERS DAILY DATA")
+        val foradmin = FirebaseDatabase.getInstance().getReference("FOR ADMIN")
         reff.keepSynced(true)
         val remarksuser = remarks.text.toString()
         val userid = FirebaseAuth.getInstance().currentUser!!.uid
@@ -293,6 +304,14 @@ class attendence : AppCompatActivity() {
                     Toast.makeText(applicationContext, "error upload data canceled", Toast.LENGTH_SHORT).show()
                     return@addOnCanceledListener
                 }
+        foradmin.child(nowD).child(userid).setValue(userdata).addOnCanceledListener {
+            Toast.makeText(applicationContext, "admin upload data canceled", Toast.LENGTH_SHORT).show()
+            return@addOnCanceledListener
+        }.addOnFailureListener {
+            Toast.makeText(applicationContext, "admin upload data failed", Toast.LENGTH_SHORT).show()
+            return@addOnFailureListener
+        }
+
 
 
     }
@@ -450,8 +469,11 @@ class attendence : AppCompatActivity() {
         }
     }
 
+    fun date(): String {
 
-
-
+        val sdf = SimpleDateFormat("dd MM yyyy")
+        val currentDate = sdf.format(Date())
+        return currentDate
+    }
 
 }

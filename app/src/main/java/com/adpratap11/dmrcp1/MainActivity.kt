@@ -113,9 +113,17 @@ class MainActivity : AppCompatActivity() {
                     auth.signInWithEmailAndPassword(email_login, pass_login).addOnSuccessListener {
 
 
-                        progressBar.visibility = View.GONE
-                        val intent = Intent(this, attendence::class.java)
-                        startActivity(intent)
+                        if (email_login != "admin@dmrc.com") {
+                            progressBar.visibility = View.GONE
+                            val intent = Intent(this, attendence::class.java)
+                            startActivity(intent)
+                        } else {
+
+                            progressBar.visibility = View.GONE
+                            val intent = Intent(this, AdminDmrc::class.java)
+                            startActivity(intent)
+
+                        }
 
 
 
