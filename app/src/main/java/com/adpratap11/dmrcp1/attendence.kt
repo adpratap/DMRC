@@ -105,7 +105,7 @@ class attendence : AppCompatActivity() {
                 } else {
 
                     val toast =
-                        Toast.makeText(applicationContext, "looooooooooooooooooooooooooooooop", Toast.LENGTH_SHORT)
+                        Toast.makeText(applicationContext, "Searching your Location", Toast.LENGTH_SHORT)
                     toast.show()
 
 
