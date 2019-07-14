@@ -76,7 +76,6 @@ class AdminDmrc : AppCompatActivity() {
     private fun loaddates() {
 
         progressBarAdmindata.visibility = View.VISIBLE
-        btnfind.visibility = View.GONE
 
 
         val adminref = FirebaseDatabase.getInstance().getReference("FOR ADMIN/" + dateinputt)

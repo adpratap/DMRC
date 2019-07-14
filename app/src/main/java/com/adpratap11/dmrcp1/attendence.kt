@@ -14,6 +14,7 @@ import android.location.LocationManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.provider.MediaStore
 import android.provider.Settings
 import android.support.v4.app.ActivityCompat
@@ -33,6 +34,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import kotlinx.android.synthetic.main.activity_attendence.*
 import java.io.ByteArrayOutputStream
+import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -61,6 +63,8 @@ class attendence : AppCompatActivity() {
 
     lateinit var usertime: String
     lateinit var userdate: String
+    var anand = ""
+    var pratap = ""
 
 
 
@@ -68,16 +72,44 @@ class attendence : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_attendence)
 
-        val toast = Toast.makeText(applicationContext, date(), Toast.LENGTH_SHORT)
-        toast.show()
+        val ha = Handler()
+        ha.postDelayed(object : Runnable {
+
+            override fun run() {
+
+                if (anand == "" && pratap == "") {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        if (checkPermission(permissions)) {
+                            getLocation()
+                        } else {
+                            requestPermissions(permissions, PERMISSION_REQUEST)
+                        }
+                    } else {
+                        getLocation()
+                    }
+                } else {
+
+                    val toast =
+                        Toast.makeText(applicationContext, "looooooooooooooooooooooooooooooop", Toast.LENGTH_SHORT)
+                    toast.show()
+
+
+                }
+
+                if (anand == "" && pratap == "") {
+                    ha.postDelayed(this, 10000)
+                }
+            }
+        }, 10000)
+
+
+
 
 
         val login = FirebaseAuth.getInstance().currentUser
         if (login != null) {
 
             getdata()
-
-            getLocation()
 
 
         } else {
@@ -93,18 +125,6 @@ class attendence : AppCompatActivity() {
 
 
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkPermission(permissions)) {
-                getLocation()
-            } else {
-                requestPermissions(permissions, PERMISSION_REQUEST)
-            }
-        } else {
-            getLocation()
-        }
-
-
-
         button_upload.setOnClickListener{
 
 
@@ -116,7 +136,7 @@ class attendence : AppCompatActivity() {
             val picuser = storageRef.child(user!!.uid).child(userdate)
             val bitmap = (profilepic.drawable as BitmapDrawable).bitmap
             val baos = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos as OutputStream?)
             val data = baos.toByteArray()
             val uploadTask = picuser.putBytes(data)
 
@@ -137,14 +157,13 @@ class attendence : AppCompatActivity() {
                 } else {
                     // Handle failures
 
+
                 }
             }
 
         }
 
         profilepic.setOnClickListener{
-
-            getLocation()
 
 
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -165,14 +184,7 @@ class attendence : AppCompatActivity() {
 
                     // Permission has already been granted
 
-
-
-
                     dispatchTakePictureIntent()
-                    getLocation()
-
-
-
 
 
                 }
@@ -256,6 +268,7 @@ class attendence : AppCompatActivity() {
 
 
 
+
         }
     }
 
@@ -322,8 +335,8 @@ class attendence : AppCompatActivity() {
 
     @SuppressLint("MissingPermission")
     private fun getLocation() {
-       // progressBar3.visibility = View.VISIBLE
-       // Toast.makeText(this, "Finding location plz Wait", Toast.LENGTH_SHORT).show()
+        progressBar3.visibility = View.VISIBLE
+        //Toast.makeText(this, "Searching location", Toast.LENGTH_SHORT).show()
 
 
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -337,8 +350,9 @@ class attendence : AppCompatActivity() {
             startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
 
 
-        }else
+        } else {
             hasGps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        }
         hasNetwork = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
         if (hasGps || hasNetwork) {
 
@@ -401,24 +415,28 @@ class attendence : AppCompatActivity() {
             }
 
             if(locationGps!= null && locationNetwork!= null){
-                //progressBar3.visibility = View.GONE
+                progressBar3.visibility = View.GONE
                 if(locationGps!!.accuracy > locationNetwork!!.accuracy){
                     latitudenet=locationNetwork!!.latitude.toString()
                     longitudenet=locationNetwork!!.longitude.toString()
                     gpslg.text="GPS longitude : $longitude"
                     gpslt.text="GPS latitude : $latitude"
+                    anand = latitude
+                    pratap = longitude
                 }else{
                     latitude=locationGps!!.latitude.toString()
                     longitude=locationGps!!.longitude.toString()
                     gpslg.text="GPS longitude : $longitude"
                     gpslt.text="GPS latitude : $latitude"
+                    anand = latitude
+                    pratap = longitude
                 }
             }
 
         } else {
 
-            //progressBar3.visibility = View.GONE
-            //Toast.makeText(applicationContext, "plz turn on gps", Toast.LENGTH_SHORT).show()
+            progressBar3.visibility = View.GONE
+            Toast.makeText(applicationContext, "plz turn on gps and net", Toast.LENGTH_SHORT).show()
             locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
 
             if( !locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ) {
@@ -428,7 +446,6 @@ class attendence : AppCompatActivity() {
 
                 startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
 
-                getLocation()
 
             }
 
