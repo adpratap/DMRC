@@ -28,6 +28,7 @@
             tools:ignore="ProtectedPermissions"/>
 
     <application
+            android:fullBackupContent="true"
             android:name=".DMRCP1"
             android:allowBackup="true"
             android:icon="@mipmap/ic_launcher"
@@ -35,7 +36,8 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/Theme.AppCompat.NoActionBar"
-            tools:ignore="GoogleAppIndexingWarning">
+            tools:ignore="GoogleAppIndexingWarning"
+            >
         <activity android:name=".AdminDmrc">
         </activity>
         <activity android:name=".admin">
