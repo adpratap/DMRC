@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
+import android.location.Geocoder
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -53,6 +54,13 @@ private var hasGps = false
 private var hasNetwork = false
 private var locationGps: Location? = null
 private var locationNetwork: Location? = null
+lateinit var user_address: String
+lateinit var user_city: String
+lateinit var user_country: String
+lateinit var user_state: String
+lateinit var user_postal: String
+lateinit var user_knownloaction: String
+lateinit var user_full_address: String
 private var permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.CAMERA)
 
 
@@ -71,6 +79,13 @@ class attendence : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_attendence)
+
+
+        //address start
+
+
+        //address end
+
 
         val ha = Handler()
         ha.postDelayed(object : Runnable {
@@ -209,6 +224,7 @@ class attendence : AppCompatActivity() {
 
     }
 
+
     private fun getdata() {
 
 
@@ -276,7 +292,7 @@ class attendence : AppCompatActivity() {
 
 
         val imurl = picurl
-        val userlocation = "GPS latitude : $latitude  longitude : $longitude"
+        val userlocation = user_full_address
         val nowTD = usertime
         val nowD = userdate
         val reff = FirebaseDatabase.getInstance().getReference("DMRC USERS DAILY DATA")
@@ -423,6 +439,20 @@ class attendence : AppCompatActivity() {
                     gpslt.text="GPS latitude : $latitude"
                     anand = latitude
                     pratap = longitude
+
+                    val thegeo = Geocoder(this, Locale.getDefault()).getFromLocation(
+                        latitude.toDouble(),
+                        longitude.toDouble(),
+                        1
+                    )
+                    user_address = thegeo.get(0).getAddressLine(0)
+
+                    user_full_address = "$user_address "
+
+                    Toast.makeText(applicationContext, user_full_address, Toast.LENGTH_LONG).show()
+
+
+
                 }else{
                     latitude=locationGps!!.latitude.toString()
                     longitude=locationGps!!.longitude.toString()
@@ -430,6 +460,23 @@ class attendence : AppCompatActivity() {
                     gpslt.text="GPS latitude : $latitude"
                     anand = latitude
                     pratap = longitude
+
+                    val thegeo = Geocoder(this, Locale.getDefault()).getFromLocation(
+                        latitude.toDouble(),
+                        longitude.toDouble(),
+                        1
+                    )
+                    user_address = thegeo.get(0).getAddressLine(0)
+                    //user_country = thegeo.get(0).countryName
+                    //user_city = thegeo.get(0).locality
+                    //user_state = thegeo.get(0).adminArea
+                    //user_postal = thegeo.get(0).postalCode
+                    //user_knownloaction = thegeo.get(0).featureName
+
+                    user_full_address = "$user_address"
+
+                    Toast.makeText(applicationContext, user_full_address, Toast.LENGTH_LONG).show()
+
                 }
             }
 
