@@ -21,8 +21,7 @@ class sign_up_page : AppCompatActivity() {
     lateinit var user : EditText
     lateinit var email : EditText
     lateinit var password : EditText
-
-    //test done
+    
 
 
 
