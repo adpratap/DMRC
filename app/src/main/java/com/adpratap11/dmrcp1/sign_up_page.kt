@@ -165,7 +165,7 @@ class sign_up_page : AppCompatActivity() {
         return Calendar.getInstance().time
     }
 
-    fun TND(): Date {
+    fun TNDe(): Date {
         return Calendar.getInstance().time
     }
 
