@@ -22,6 +22,8 @@ class sign_up_page : AppCompatActivity() {
     lateinit var email : EditText
     lateinit var password : EditText
 
+    //test done
+
 
 
 
@@ -164,6 +166,5 @@ class sign_up_page : AppCompatActivity() {
         return Calendar.getInstance().time
     }
 
-    //good work
 
 }
